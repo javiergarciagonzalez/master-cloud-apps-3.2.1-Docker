@@ -4,9 +4,6 @@ import DebugLib from 'debug';
 
 const debug = new DebugLib('server:mysql');
 
-console.log('process.env.toString()');
-console.log(process.env.DATABASE_HOST);
-
 const dbHost = process.env.DATABASE_HOST || 'eoloplantsDB';
 const dbUser = process.env.DATABASE_USER || 'root';
 const dbPass = process.env.DATABASE_PASS || 'password';
