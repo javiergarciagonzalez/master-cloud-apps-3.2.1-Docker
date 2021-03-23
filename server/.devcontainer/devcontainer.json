@@ -4,7 +4,7 @@
 	"settings": { 
 		"terminal.integrated.shell.linux": null
 	},
-	"runArgs": ["--network=host"],
+	"runArgs": ["--network=host","--env-file",".devcontainer/vars.env"],
 	"forwardPorts": [3000],
 	"remoteUser": "node"
 }
