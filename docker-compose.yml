@@ -1,0 +1,66 @@
+version: "3.9"
+
+services:
+  server:
+    image: javiergarciagon/eoloplanner-server
+    ports:
+    - 3000:3000
+    depends_on:
+    - mysql
+    - rabbitmq
+    env_file: 
+    - vars.env
+    command: ["./wait-for-it.sh", "-t", "100", "mysql:3306", "--", "./wait-for-it.sh", "-t", "100", "rabbitmq:5672", "--", "node", "src/server.js"]
+
+  planner:
+    image: javiergarciagon/eoloplanner-planner
+    env_file: 
+    - vars.env
+    depends_on: 
+    - toposervice
+    - weatherservice
+    command: ["./wait-for-it.sh", "-t", "100", "rabbitmq:5672", "--", "java", "-jar", "planner-0.0.1-SNAPSHOT.jar"]
+
+  toposervice: 
+    image: javiergarciagon/eoloplanner-toposervice
+    ports:
+    - 8080:8080
+    env_file:
+    - vars.env
+    depends_on:
+    - mongo
+
+  weatherservice: 
+    image: javiergarciagon/eoloplanner-weatherservice
+    ports:
+    - 9090:9090
+    env_file:
+    - vars.env
+
+  mongo:
+    image: mongo:4.4.4
+    ports:
+    - 27017:27017
+    - 27018:27018
+    - 27019:27019
+    env_file:
+    - vars.env
+    volumes:
+    - ./data/mongo:/data/db
+
+  mysql:
+    image: mysql:8.0
+    ports:
+    - 3306:3306
+    env_file:
+    - vars.env
+    volumes:
+    - ./data/mysql:/var/lib/mysql
+
+  rabbitmq:
+    image: rabbitmq:3.8.14-alpine
+    ports:
+    - 5672:5672
+    - 15672:15672
+    volumes:
+    - ./data/rabbitmq:/var/lib/rabbitmq/mnesia/
